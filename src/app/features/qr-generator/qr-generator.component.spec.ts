@@ -1,4 +1,6 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
+import { HttpClientTestingModule } from '@angular/common/http/testing';
+import { ReactiveFormsModule } from '@angular/forms';
 
 import { QrGeneratorComponent } from './qr-generator.component';
 
@@ -8,7 +10,11 @@ describe('QrGeneratorComponent', () => {
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      imports: [QrGeneratorComponent]
+      imports: [
+        QrGeneratorComponent,
+        HttpClientTestingModule,
+        ReactiveFormsModule
+      ]
     })
     .compileComponents();
 
