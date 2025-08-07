@@ -1,0 +1,103 @@
+<div class="qr-generator-container">
+  <div class="header">
+    <h1>QR Code Generator</h1>
+    <p>Enter any text or URL to generate a QR code instantly</p>
+  </div>
+
+  <!-- QR Generation Form -->
+  <form [formGroup]="qrForm" (ngSubmit)="generateQrCode()" class="qr-form">
+    <div class="form-group">
+      <label for="text">Text or URL to encode:</label>
+      <textarea
+        id="text"
+        formControlName="text"
+        placeholder="Enter text, URL, or any content you want to encode..."
+        rows="3"
+        [class.error]="hasError('text')"
+      ></textarea>
+
+      <!-- Field Validation Messages -->
+      <div class="error-message" *ngIf="hasError('text')">
+        {{ getErrorMessage('text') }}
+      </div>
+
+      <!-- Character Counter -->
+      <div class="char-counter">
+        {{ qrForm.get('text')?.value?.length || 0 }} / 500 characters
+      </div>
+    </div>
+
+    <!-- Action Buttons -->
+    <div class="button-group">
+      <button
+        type="submit"
+        [disabled]="qrForm.invalid || isLoading"
+        class="btn btn-primary"
+      >
+        <span *ngIf="isLoading" class="loading-spinner"></span>
+        {{ isLoading ? 'Generating...' : 'Generate QR Code' }}
+      </button>
+
+      <button
+        type="button"
+        (click)="clearForm()"
+        class="btn btn-secondary"
+        [disabled]="isLoading"
+      >
+        Clear
+      </button>
+    </div>
+  </form>
+
+  <!-- Success Message -->
+  <div *ngIf="successMessage" class="alert alert-success">
+    <span class="icon">✅</span>
+    {{ successMessage }}
+  </div>
+
+  <!-- Error Message -->
+  <div *ngIf="errorMessage" class="alert alert-error">
+    <span class="icon">❌</span>
+    {{ errorMessage }}
+  </div>
+
+  <!-- QR Code Result -->
+  <div *ngIf="qrImageUrl" class="qr-result">
+    <h3>Generated QR Code</h3>
+    <div class="qr-image-container">
+      <img [src]="qrImageUrl" alt="Generated QR Code" class="qr-image">
+    </div>
+
+    <!-- Download Button -->
+    <div class="download-section">
+      <button
+        (click)="downloadQrCode()"
+        class="btn btn-download"
+      >
+        <span class="icon">⬇️</span>
+        Download PNG
+      </button>
+      <p class="download-hint">Right-click the image to copy or save</p>
+    </div>
+  </div>
+
+  <!-- Usage Examples -->
+  <div class="examples-section">
+    <h3>Quick Examples</h3>
+    <div class="examples-grid">
+      <button
+        *ngFor="let example of [
+          'https://www.google.com',
+          'mailto:contact@example.com',
+          'tel:+1234567890',
+          'Hello World!'
+        ]"
+        (click)="qrForm.patchValue({text: example})"
+        class="example-btn"
+        type="button"
+      >
+        {{ example }}
+      </button>
+    </div>
+  </div>
+</div>
