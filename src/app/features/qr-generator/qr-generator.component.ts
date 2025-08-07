@@ -51,133 +51,16 @@ export class QrGeneratorComponent implements OnInit {
     this.successMessage = '';
     this.qrImageUrl = null;
 
-    console.log('🎯 Component - Testing simple version first...');
+    console.log('🎯 Component - Generating QR code for:', text);
 
-    // Try simple version first
-    this.qrCodeService.generateQrCodeSimple(text)
-      .pipe(
-        finalize(() => this.isLoading = false)
-      )
-      .subscribe({
-        next: (blob: Blob) => {
-          console.log('🎉 Component - Received blob from SIMPLE method:', {
-            size: blob.size,
-            type: blob.type,
-            text: text
-          });
-
-          // Validate blob
-          if (!blob || blob.size === 0) {
-            throw new Error('Received empty blob from server');
-          }
-
-          // Create a safe URL for the image blob
-          const imageUrl = URL.createObjectURL(blob);
-          console.log('🖼️ Component - Created object URL:', imageUrl);
-
-          this.qrImageUrl = this.sanitizer.bypassSecurityTrustUrl(imageUrl);
-          this.successMessage = 'QR code generated successfully!';
-
-          console.log('✅ Component - Success! QR image ready to display');
-        },
-        error: (error: Error) => {
-          console.error('🚨 Component - Simple method failed, trying manual encoding method...', error);
-
-          // If simple fails, try the manual encoding version
-          this.tryManualEncodingMethod(text);
-        }
-      });
-  }
-
-  /**
-   * Try manual encoding method
-   */
-  private tryManualEncodingMethod(text: string): void {
-    this.qrCodeService.generateQrCodeWithEncoding(text)
-      .pipe(
-        finalize(() => this.isLoading = false)
-      )
-      .subscribe({
-        next: (blob: Blob) => {
-          console.log('🎉 Component - Received blob from MANUAL ENCODING method:', {
-            size: blob.size,
-            type: blob.type,
-            text: text
-          });
-
-          // Validate blob
-          if (!blob || blob.size === 0) {
-            throw new Error('Received empty blob from server');
-          }
-
-          // Create a safe URL for the image blob
-          const imageUrl = URL.createObjectURL(blob);
-          console.log('🖼️ Component - Created object URL:', imageUrl);
-
-          this.qrImageUrl = this.sanitizer.bypassSecurityTrustUrl(imageUrl);
-          this.successMessage = 'QR code generated successfully!';
-
-          console.log('✅ Component - Success! QR image ready to display');
-        },
-        error: (error: Error) => {
-          console.error('🚨 Component - Manual encoding method failed, trying HttpParams method...', error);
-
-          // If manual encoding fails, try HttpParams method
-          this.tryHttpParamsMethod(text);
-        }
-      });
-  }
-
-  /**
-   * Try HttpParams method
-   */
-  private tryHttpParamsMethod(text: string): void {
-    this.qrCodeService.generateQrCodeWithHttpParams(text)
-      .pipe(
-        finalize(() => this.isLoading = false)
-      )
-      .subscribe({
-        next: (blob: Blob) => {
-          console.log('🎉 Component - Received blob from HTTPPARAMS method:', {
-            size: blob.size,
-            type: blob.type,
-            text: text
-          });
-
-          // Validate blob
-          if (!blob || blob.size === 0) {
-            throw new Error('Received empty blob from server');
-          }
-
-          // Create a safe URL for the image blob
-          const imageUrl = URL.createObjectURL(blob);
-          console.log('🖼️ Component - Created object URL:', imageUrl);
-
-          this.qrImageUrl = this.sanitizer.bypassSecurityTrustUrl(imageUrl);
-          this.successMessage = 'QR code generated successfully!';
-
-          console.log('✅ Component - Success! QR image ready to display');
-        },
-        error: (error: Error) => {
-          console.error('🚨 Component - HttpParams method failed, trying complex method...', error);
-
-          // If HttpParams fails, try the complex version
-          this.tryComplexMethod(text);
-        }
-      });
-  }
-
-  /**
-   * Fallback to complex method if simple fails
-   */
-  private tryComplexMethod(text: string): void {
+    // Use the simplified service method
     this.qrCodeService.generateQrCode(text)
       .pipe(
         finalize(() => this.isLoading = false)
       )
       .subscribe({
         next: (blob: Blob) => {
-          console.log('🎉 Component - Received blob from COMPLEX method:', {
+          console.log('🎉 Component - Received blob:', {
             size: blob.size,
             type: blob.type,
             text: text
@@ -198,8 +81,8 @@ export class QrGeneratorComponent implements OnInit {
           console.log('✅ Component - Success! QR image ready to display');
         },
         error: (error: Error) => {
-          console.error('🚨 Component - Error occurred:', error);
-          this.errorMessage = error.message || 'Failed to generate QR code. Please try again.';
+          console.error('🚨 Component - Error generating QR code:', error);
+          this.errorMessage = `Failed to generate QR code: ${error.message}`;
         }
       });
   }
