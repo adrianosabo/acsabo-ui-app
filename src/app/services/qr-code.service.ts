@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpParams } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { tap, catchError } from 'rxjs/operators';
 
@@ -18,13 +18,25 @@ export class QrCodeService {
    */
   generateQrCode(text: string): Observable<Blob> {
     const url = `${this.apiUrl}/qrcode`;
-    const params = { text: text.trim() };
+    const trimmedText = text.trim();
+
+    // Try manual URL encoding for better control
+    const encodedText = encodeURIComponent(trimmedText);
+    const fullUrl = `${url}?text=${encodedText}`;
 
     console.log('🚀 QR Service - Making request to:', url);
-    console.log('� QR Service - With params:', params);
+    console.log('🚀 QR Service - With params:', { text: trimmedText });
+    console.log('🔍 URL encoding analysis:', {
+      originalText: text,
+      trimmedText: trimmedText,
+      hasProtocol: trimmedText.includes('://'),
+      hasSlashes: trimmedText.includes('/'),
+      hasColons: trimmedText.includes(':'),
+      manualEncoded: encodedText,
+      fullUrl: fullUrl
+    });
 
-    return this.http.get(url, {
-      params,
+    return this.http.get(fullUrl, {
       responseType: 'blob'
     }).pipe(
       tap((blob: Blob) => {
@@ -35,8 +47,8 @@ export class QrCodeService {
       }),
       catchError((error) => {
         console.error('🚨 QR Service - Error:', error);
-        console.error('🚨 Request URL was:', url);
-        console.error('🚨 Request params were:', params);
+        console.error('🚨 Request URL was:', fullUrl);
+        console.error('🚨 Original text was:', trimmedText);
         throw error;
       })
     );
